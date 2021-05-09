@@ -5,7 +5,7 @@ import 'package:flutter_app_movie/Model/SearchMoviesModel.dart';
 class SearchMoviesService {
   Future<List<Result>> searchMovies(String name) async {
     Uri uri = Uri.parse(
-        "https://api.themoviedb.org/3/search/movie?api_key=a3fa19231e95aec0611c5d99110d10ef&query=fast");
+        "https://api.themoviedb.org/3/search/movie?api_key=a3fa19231e95aec0611c5d99110d10ef&query=$name");
 
     var response = await client.get(uri);
     if (response.statusCode == 200) {
