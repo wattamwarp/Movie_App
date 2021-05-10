@@ -13,6 +13,7 @@ class SearchMoviesService {
       var data = SearchMoviesModel.fromJson(jsonString);
       List<Result> list = data.results;
 
+      print("main list length is"+list.length.toString());
       return list;
     } else {
       return null;

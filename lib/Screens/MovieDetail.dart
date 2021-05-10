@@ -87,7 +87,7 @@ class _MovieDetailState extends State<MovieDetail> {
                   width: _width,
                   height: 50,
                   //color: Colors.black38,
-                  child:!UniversalPlatform.isWeb ? Row(
+                  child:UniversalPlatform.isAndroid || UniversalPlatform.isIOS ? Row(
                     children: [
                       InkWell(
                         onTap: () {

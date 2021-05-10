@@ -12,11 +12,20 @@ class SearchMoviesController extends GetxController{
   var searchList = List<Result>().obs;
   var isLoading = true.obs;
   var noData= true.obs;
+  var indicator= false.obs;
+
+  var tempList=List<Result>().obs;
+
+  int listLength,dif,cuurIndex,count;
 
   @override
   void onInit() {
     // TODO: implement onInit
 
+    listLength=0;
+    dif=0;
+    cuurIndex=0;
+    count=-1;
     super.onInit();
   }
 
@@ -29,6 +38,29 @@ class SearchMoviesController extends GetxController{
 
   }
 
+  addRows(int add){
+
+    dif = listLength - count;
+
+    if(dif >=10){
+
+      for(var i =count;i<(count+9);i++)
+        {
+
+          tempList.add(searchList[i]);
+          count = count +1;
+        }
+    }else{
+
+      for( var i =count;i<(dif+ count);i++)
+      {
+
+        tempList.add(searchList[i]);
+        count = count +1;
+      }
+    }
+
+  }
 
 
   setMovie(Result data, BuildContext context){
@@ -37,7 +69,7 @@ class SearchMoviesController extends GetxController{
 
   _setMovieId(Result data , BuildContext context) async {
     String lang;
-    if(data.originalLanguage=="en"){
+    if(data.originalLanguage.toString()=="en"){
       lang="English";
     }else{
       lang="Non-English";
@@ -61,6 +93,7 @@ class SearchMoviesController extends GetxController{
   }
 
   void fetchSearchedMovies(String name) async {
+    count=0;
     if(name == null || name.length==0||name.isEmpty){
       noData(true);
     }
@@ -71,7 +104,22 @@ class SearchMoviesController extends GetxController{
       isLoading(true);
       var list = await searchMoviesService.searchMovies(name);
       if (list != null) {
+        tempList.value.clear();
+
+        listLength = searchList.length;
          searchList.value = list;
+
+         if(searchList.length< 10){
+           count = searchList.length;
+           tempList=searchList;
+
+         }else{
+           int i=0;
+           for(i=0;i<10;i++){
+             tempList.add(searchList[i]);
+              count++;
+           }
+         }
       }
     } finally {
       isLoading(false);

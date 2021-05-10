@@ -2,11 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_movie/Controller/GetMoviesController.dart';
 import 'package:flutter_app_movie/Controller/SearchMoviesController.dart';
-import 'package:flutter_app_movie/Model/GetMoviesModel.dart';
+
+//import 'package:flutter_app_movie/Model/GetMoviesModel.dart';
+import 'package:flutter_app_movie/Model/SearchMoviesModel.dart';
 import 'package:flutter_app_movie/Services/GetMoviesService.dart';
+import 'package:flutter_app_movie/Services/SearchMoviesService.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
+import 'package:lazy_loading_list/lazy_loading_list.dart';
+import 'package:pagination_view/pagination_view.dart';
 import 'package:universal_platform/universal_platform.dart';
 //import 'package:meet_network_image/meet_network_image.dart';
 
@@ -21,6 +26,7 @@ class _LandinPageState extends State<LandinPage> {
       Get.put(SearchMoviesController());
 
   TextEditingController search = new TextEditingController();
+  ScrollController _scrollController;
 
   @override
   void initState() {
@@ -169,9 +175,12 @@ class _LandinPageState extends State<LandinPage> {
                                                               .spaceBetween,
                                                       children: [
                                                         Container(
+                                                          //width:200,
+                                                          constraints: BoxConstraints(minWidth: 50, maxWidth:_width< 700 &&_width>350 ? 110:200),
                                                           margin:
                                                               EdgeInsets.only(
                                                                   left: 12),
+                                                          //color: Colors.red,
                                                           child: Text(
                                                             getMovieCon
                                                                 .moviesList[
@@ -183,6 +192,8 @@ class _LandinPageState extends State<LandinPage> {
                                                                     FontWeight
                                                                         .w600,
                                                                 fontSize: 16),
+                                                            maxLines: 1,
+                                                            overflow:TextOverflow.ellipsis ,
                                                           ),
                                                         ),
                                                         Container(
@@ -280,7 +291,7 @@ class _LandinPageState extends State<LandinPage> {
                               return Center(
                                 child: CircularProgressIndicator(),
                               );
-                            } else
+                            } else {
                               return _width > 1000
                                   ? StaggeredGridView.countBuilder(
                                       crossAxisCount: 2,
@@ -326,46 +337,91 @@ class _LandinPageState extends State<LandinPage> {
                                       staggeredTileBuilder: (index) =>
                                           StaggeredTile.fit(1),
                                     )
-                                  : ListView.builder(
-                                      itemCount: searchMoviesController
-                                          .searchList.length,
-                                      itemBuilder: (context, index) {
-                                        return InkWell(
-                                          onTap: () {
-                                            searchMoviesController.setMovie(
-                                                searchMoviesController
-                                                    .searchList[index],
-                                                context);
-                                          },
-                                          child: Card(
-                                            child: Container(
-                                              height: 150,
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        height: 150,
-                                                        width: 100,
-                                                        child: image(
-                                                            "https://image.tmdb.org/t/p/original/${searchMoviesController.searchList[index].posterPath.toString()}"),
-                                                      ),
-                                                      Container(
-                                                        width: _width - 110,
-                                                        height: 150,
-                                                        //color: Colors.red,
-                                                        child: data(_height,
-                                                            _width, index),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                  : NotificationListener<ScrollNotification>(
+                                    child: ListView.builder(
+                                      controller: _scrollController,
+                                        itemCount: searchMoviesController
+                                            .tempList.length,
+                                        itemBuilder: (context, index) {
+                                          if(index /10 ==0){
+
+                                            return Card(
+                                              child: Container(
+                                                height: 150,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          height: 150,
+                                                          width: 100,
+                                                          child: image(
+                                                              "https://image.tmdb.org/t/p/original/${searchMoviesController.tempList[index].posterPath.toString()}"),
+                                                        ),
+                                                        Container(
+                                                          width: _width - 110,
+                                                          height: 150,
+                                                          //color: Colors.red,
+                                                          child: data(_height,
+                                                              _width, index),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ) ;
+                                          }
+                                          else
+
+                                          return InkWell(
+                                            onTap: () {
+                                              searchMoviesController.setMovie(
+                                                  searchMoviesController
+                                                      .tempList[index],
+                                                  context);
+                                            },
+                                            child: Card(
+                                              child: Container(
+                                                height: 150,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          height: 150,
+                                                          width: 100,
+                                                          child: image(
+                                                              "https://image.tmdb.org/t/p/original/${searchMoviesController.tempList[index].posterPath.toString()}"),
+                                                        ),
+                                                        Container(
+                                                          width: _width - 110,
+                                                          height: 150,
+
+                                                          child: data(_height,
+                                                              _width, index),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
+                                          );
+                                        },
+                                      ),
+                                onNotification: (t) {
+                                  if (t.metrics.pixels ==
+                                      t.metrics.maxScrollExtent) {
+                                    searchMoviesController.addRows(10);
+
+                                    return true;
+                                  }
+
+                                  return false;
+                                }
+                                  );
+                            }
                           }),
                         ),
                       )
@@ -379,6 +435,7 @@ class _LandinPageState extends State<LandinPage> {
       ),
     );
   }
+
 
   Widget image(String path) {
     return Image.network(
@@ -406,7 +463,7 @@ class _LandinPageState extends State<LandinPage> {
                 width: _width - 190,
                 margin: EdgeInsets.only(left: 12),
                 child: Text(
-                  searchMoviesController.searchList[index].originalTitle
+                  searchMoviesController.tempList[index].originalTitle
                       .toString(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -418,7 +475,7 @@ class _LandinPageState extends State<LandinPage> {
                 child: Row(
                   children: [
                     Text(
-                      searchMoviesController.searchList[index].voteAverage
+                      searchMoviesController.tempList[index].voteAverage
                           .toString(),
                       style:
                           TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -442,7 +499,7 @@ class _LandinPageState extends State<LandinPage> {
               Container(
                 margin: EdgeInsets.only(left: 12),
                 child: Text(
-                  searchMoviesController.searchList[index].originalLanguage
+                  searchMoviesController.tempList[index].originalLanguage
                       .toString(),
                   style: TextStyle(fontSize: 12),
                 ),
@@ -450,8 +507,7 @@ class _LandinPageState extends State<LandinPage> {
               Container(
                 margin: EdgeInsets.only(right: 12),
                 child: Text(
-                  searchMoviesController.searchList[index].popularity
-                      .toString(),
+                  searchMoviesController.tempList[index].popularity.toString(),
                   style: TextStyle(fontSize: 12),
                 ),
               ),
@@ -462,7 +518,7 @@ class _LandinPageState extends State<LandinPage> {
           width: _width - 110,
           margin: EdgeInsets.only(left: 12, top: 18),
           child: Text(
-            searchMoviesController.searchList[index].overview.toString(),
+            searchMoviesController.tempList[index].overview.toString(),
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 10),
