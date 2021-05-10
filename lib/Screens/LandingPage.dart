@@ -10,8 +10,7 @@ import 'package:flutter_app_movie/Services/SearchMoviesService.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
-import 'package:lazy_loading_list/lazy_loading_list.dart';
-import 'package:pagination_view/pagination_view.dart';
+
 import 'package:universal_platform/universal_platform.dart';
 //import 'package:meet_network_image/meet_network_image.dart';
 
