@@ -286,7 +286,7 @@ class _LandinPageState extends State<LandinPage> {
                                 child: Text("search something in search bar"),
                               );
                             } else if (searchMoviesController.isLoading.value ==
-                                true) {
+                                true ||searchMoviesController.tempList.length ==null) {
                               return Center(
                                 child: CircularProgressIndicator(),
                               );
@@ -412,8 +412,11 @@ class _LandinPageState extends State<LandinPage> {
                                 onNotification: (t) {
                                   if (t.metrics.pixels ==
                                       t.metrics.maxScrollExtent) {
-                                    searchMoviesController.addRows(10);
+                                    String a= search.text.toString();
+                                    print("the a is "+a);
+                                    searchMoviesController.addRows(a);
 
+                                    delay();
                                     return true;
                                   }
 
@@ -433,6 +436,10 @@ class _LandinPageState extends State<LandinPage> {
         ),
       ),
     );
+  }
+  
+  delay(){
+    return Future.delayed(Duration(seconds: 3));
   }
 
 

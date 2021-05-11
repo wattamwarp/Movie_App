@@ -15,6 +15,8 @@ class SearchMoviesController extends GetxController{
   var indicator= false.obs;
 
   var tempList=List<Result>().obs;
+  bool load=true;
+
 
   int listLength,dif,cuurIndex,count;
 
@@ -25,7 +27,7 @@ class SearchMoviesController extends GetxController{
     listLength=0;
     dif=0;
     cuurIndex=0;
-    count=-1;
+    count=1;
     super.onInit();
   }
 
@@ -38,26 +40,31 @@ class SearchMoviesController extends GetxController{
 
   }
 
-  addRows(int add){
+  addRows(String name){
+    _addRows(name);
+  }
+  _addRows(String name) async {
 
-    dif = listLength - count;
 
-    if(dif >=10){
+    try {
+      //isLoading(true);
+      if(load) {
+        load=false;
+        print("count is " + count.toString());
+        var list = await searchMoviesService.searchMovies(name, count);
 
-      for(var i =count;i<(count+9);i++)
-        {
 
-          tempList.add(searchList[i]);
-          count = count +1;
-        }
-    }else{
+        tempList.addAll(list);
 
-      for( var i =count;i<(dif+ count);i++)
-      {
+        print("temp list length is " + tempList.length.toString());
+        await Future.delayed(Duration(seconds: 5));
+        count++;
+        print("after count is" + count.toString());
 
-        tempList.add(searchList[i]);
-        count = count +1;
+        load=true;
       }
+
+    } finally {
     }
 
   }
@@ -93,7 +100,10 @@ class SearchMoviesController extends GetxController{
   }
 
   void fetchSearchedMovies(String name) async {
-    count=0;
+    count=1;
+    tempList.clear();
+    print("temp list start len is"+tempList.length.toString());
+    print("cleared count is"+count.toString());
     if(name == null || name.length==0||name.isEmpty){
       noData(true);
     }
@@ -101,26 +111,14 @@ class SearchMoviesController extends GetxController{
       noData(false);
     }
     try {
+      count=1;
       isLoading(true);
-      var list = await searchMoviesService.searchMovies(name,1);
-      if (list != null) {
-        tempList.value.clear();
+      var list = await searchMoviesService.searchMovies(name,count);
+      if (list != null)
 
-        listLength = searchList.length;
-         searchList.value = list;
+          tempList.value =list;
 
-         if(searchList.length< 10){
-           count = searchList.length;
-           tempList=searchList;
-
-         }else{
-           int i=0;
-           for(i=0;i<10;i++){
-             tempList.add(searchList[i]);
-              count++;
-           }
-         }
-      }
+count=2;
     } finally {
       isLoading(false);
     }
