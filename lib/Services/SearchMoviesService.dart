@@ -3,9 +3,9 @@ import 'package:http/http.dart' as client;
 import 'package:flutter_app_movie/Model/SearchMoviesModel.dart';
 
 class SearchMoviesService {
-  Future<List<Result>> searchMovies(String name) async {
+  Future<List<Result>> searchMovies(String name,int page) async {
     Uri uri = Uri.parse(
-        "https://api.themoviedb.org/3/search/movie?api_key=a3fa19231e95aec0611c5d99110d10ef&query=$name");
+        "https://api.themoviedb.org/3/search/movie?api_key=a3fa19231e95aec0611c5d99110d10ef&query=$name&page=$page");
 
     var response = await client.get(uri);
     if (response.statusCode == 200) {

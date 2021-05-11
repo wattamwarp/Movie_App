@@ -102,7 +102,7 @@ class SearchMoviesController extends GetxController{
     }
     try {
       isLoading(true);
-      var list = await searchMoviesService.searchMovies(name);
+      var list = await searchMoviesService.searchMovies(name,1);
       if (list != null) {
         tempList.value.clear();
 
